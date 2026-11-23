@@ -5,7 +5,7 @@ from math import cos, pi, sin
 
 from PIL import Image, ImageDraw, ImageFont
 
-from game_logic import MISS_WINDOW, TARGETS
+from game_logic import DIFFICULTIES, TARGETS
 
 WIDTH, HEIGHT = 680, 380
 CENTER = (298, 186)
@@ -80,15 +80,15 @@ def draw_approach(draw, active, game, now):
     y = CENTER[1]
     hit_x = CENTER[0] + radius
     origin = WIDTH + 10
-    travel = game.travel_ms if game else 2000
-    speed = (origin - hit_x) / travel
-    tolerance = round(MISS_WINDOW * speed)
+    difficulty = game.difficulty if game else DIFFICULTIES["연습"]
+    speed = (origin - hit_x) / difficulty.travel_ms
+    tolerance = round(difficulty.capture_window_ms * speed)
     error = now - game.hit_at if game else 0
-    in_window = game is not None and abs(error) <= MISS_WINDOW
+    in_window = game is not None and game.in_capture_window(now)
 
     target_color = GOLD if in_window else "#c79b57"
     draw.rectangle((hit_x - tolerance, y - 19, hit_x + tolerance, y + 19),
-                   fill="#5b442c" if in_window else "#332f33",
+                   fill="#745122" if in_window else "#332f33",
                    outline=target_color)
     draw.line((hit_x + tolerance, y, WIDTH - 2, y), fill="#687b98", width=2)
     draw.line((hit_x, y - 26, hit_x, y + 26), fill=target_color, width=3)
