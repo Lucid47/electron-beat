@@ -1,10 +1,12 @@
 import streamlit as st
 
-from game_logic import DIFFICULTIES, SHELLS, TARGETS, TIMING_GRADES, Game, clock_ms
-from game_view import draw_board
+from capture_rules import DIFFICULTIES, SHELLS, TARGETS, TIMING_GRADES, Game, clock_ms
+from orbit_view import draw_board
 
 st.set_page_config(page_title="전자껍질 리듬게임", page_icon="⚛️", layout="centered")
-st.session_state.setdefault("game", None)
+# An open tab may still hold a game object from before a deployment.
+if not isinstance(st.session_state.get("game"), Game):
+    st.session_state.game = None
 st.session_state.setdefault("best_score", 0)
 
 

@@ -5,7 +5,7 @@ from math import cos, pi, sin
 
 from PIL import Image, ImageDraw, ImageFont
 
-from game_logic import DIFFICULTIES, TARGETS
+from capture_rules import DIFFICULTIES, TARGETS
 
 WIDTH, HEIGHT = 680, 380
 CENTER = (298, 186)
