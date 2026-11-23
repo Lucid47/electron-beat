@@ -1,11 +1,11 @@
 from base64 import b64encode
 from functools import lru_cache
 from io import BytesIO
-from math import cos, pi, sin
+from math import cos, sin, tau
 
 from PIL import Image, ImageDraw, ImageFont
 
-from capture_rules import DIFFICULTIES, TARGETS
+from stage_rules import DIFFICULTIES, SHELL_NAMES
 
 WIDTH, HEIGHT = 680, 380
 CENTER = (298, 186)
@@ -40,29 +40,30 @@ def background():
     return board
 
 
-def draw_board(game, now):
+def draw_board(stage, now, game=None):
     board = background().copy()
     draw = ImageDraw.Draw(board)
     active = game.target if game else 0
-    for index, radius in enumerate(RADII):
+    for index in range(len(stage.shells)):
+        radius = RADII[index]
         color = ORBIT_COLORS[index]
         circle(draw, CENTER, radius + 4, outline="#263854")
         circle(draw, CENTER, radius, outline=color if active == index else "#64748d", width=2)
-        label = "K" if index == 0 else "L"
+        label = SHELL_NAMES[index]
         tag = orbit_point(radius, -2.3)
         circle(draw, tag, 14, fill="#182842", outline=color, width=2)
         draw.text(tag, label, fill=color, font=font(17), anchor="mm")
 
     circle(draw, CENTER, 43, fill="#203f5d", outline="#4f8ba5", width=2)
-    draw.text((CENTER[0], CENTER[1] - 5), "Li", fill="#eefbff", font=font(39), anchor="mm")
-    draw.text((CENTER[0], CENTER[1] + 23), "03", fill="#a4c7e2", font=font(13), anchor="mm")
+    draw.text((CENTER[0], CENTER[1] - 5), stage.symbol, fill="#eefbff", font=font(39), anchor="mm")
+    draw.text((CENTER[0], CENTER[1] + 23), f"{stage.number:02d}", fill="#a4c7e2", font=font(13), anchor="mm")
 
     if game:
-        for index, captured_at in enumerate(game.captured):
-            shell = TARGETS[index]
-            elapsed = (now - captured_at) / 1000
+        elapsed = (now - game.started_at) / 1000
+        for index, shell in enumerate(stage.targets[:len(game.captured)]):
+            slot = index - sum(stage.shells[:shell])
             speed = 1.35 if shell == 0 else -0.8
-            angle = speed * elapsed + (index * pi if index else 0)
+            angle = speed * elapsed + tau * slot / stage.shells[shell]
             xy = orbit_point(RADII[shell], angle)
             circle(draw, xy, 11, fill="#283c60")
             circle(draw, xy, 7, fill=ORBIT_COLORS[shell])

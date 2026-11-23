@@ -2,8 +2,40 @@ from dataclasses import dataclass, field
 from math import ceil
 from time import monotonic_ns
 
-SHELLS = [("K", 2), ("L", 1)]
-TARGETS = [index for index, (_, count) in enumerate(SHELLS) for _ in range(count)]
+SHELL_NAMES = ["K", "L"]
+
+
+@dataclass(frozen=True)
+class Stage:
+    number: int
+    symbol: str
+    name: str
+    shells: tuple[int, ...]
+    configuration: str
+
+    @property
+    def targets(self):
+        return [shell for shell, count in enumerate(self.shells) for _ in range(count)]
+
+    @property
+    def shell_summary(self):
+        return " · ".join(
+            f"{name} 껍질 {count}개" for name, count in zip(SHELL_NAMES, self.shells)
+        )
+
+
+STAGES = [
+    Stage(1, "H", "수소", (1,), "1s¹"),
+    Stage(2, "He", "헬륨", (2,), "1s²"),
+    Stage(3, "Li", "리튬", (2, 1), "1s² 2s¹"),
+    Stage(4, "Be", "베릴륨", (2, 2), "1s² 2s²"),
+    Stage(5, "B", "붕소", (2, 3), "1s² 2s² 2p¹"),
+    Stage(6, "C", "탄소", (2, 4), "1s² 2s² 2p²"),
+    Stage(7, "N", "질소", (2, 5), "1s² 2s² 2p³"),
+    Stage(8, "O", "산소", (2, 6), "1s² 2s² 2p⁴"),
+    Stage(9, "F", "플루오린", (2, 7), "1s² 2s² 2p⁵"),
+    Stage(10, "Ne", "네온", (2, 8), "1s² 2s² 2p⁶"),
+]
 
 TIMING_GRADES = [("PERFECT", 100), ("GREAT", 70), ("GOOD", 40)]
 
@@ -38,6 +70,7 @@ def judge_timing(error_ms, difficulty):
 
 @dataclass
 class Game:
+    stage: Stage
     difficulty: Difficulty
     started_at: int
     captured: list[int] = field(default_factory=list)
@@ -52,11 +85,11 @@ class Game:
 
     @property
     def complete(self):
-        return len(self.captured) == len(TARGETS)
+        return len(self.captured) == self.stage.number
 
     @property
     def target(self):
-        return None if self.complete else TARGETS[len(self.captured)]
+        return None if self.complete else self.stage.targets[len(self.captured)]
 
     @property
     def spawn_at(self):
