@@ -2,6 +2,9 @@
 
 Streamlit에서 리튬 원자를 완성하는 Python 리듬게임입니다. 노란 전자가 포획 구간 안에 있을 때 PC에서 클릭하거나 모바일에서 터치하세요. K 껍질에 2개, L 껍질에 1개를 채우면 완성입니다. 포획 구간은 판정선 기준 연습 모드 ±550ms, 보통 모드 ±350ms입니다.
 
+- [Streamlit에서 게임 플레이](https://electron-beat-lrft2vmtylcozopf2bjezx.streamlit.app/)
+- [전체 개발계획서와 GitHub 포크·배포 안내](DEVELOPMENT_PLAN.md)
+
 ## 실행
 
 Python 3.12 환경에서 아래 명령을 실행합니다.
